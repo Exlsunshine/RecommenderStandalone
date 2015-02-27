@@ -28,10 +28,10 @@ namespace RS
 	public:
 		static const long DEFAULT_MIN_RELOAD_INTERVAL_MS;// = 60 * 1000L;
 
-		FileDataModel(std::FILE dataFile);
-		FileDataModel(std::FILE dataFile, std::string delimiterRegex);
-		FileDataModel(std::FILE dataFile, bool transpose, long minReloadIntervalMS);
-		FileDataModel(std::FILE dataFile, bool transpose, long minReloadIntervalMS, std::string delimiterRegex);
+		FileDataModel(std::FILE *dataFile);
+		FileDataModel(std::FILE *dataFile, std::string delimiterRegex);
+		FileDataModel(std::FILE *dataFile, bool transpose, long minReloadIntervalMS);
+		FileDataModel(std::FILE *dataFile, bool transpose, long minReloadIntervalMS, std::string delimiterRegex);
 		std::FILE getDataFile();
 		static char determineDelimiter(std::string line);
 
@@ -66,6 +66,9 @@ namespace RS
 		long readUserIDFromString(std::string value);
 		long readItemIDFromString(std::string value);
 		long readTimestampFromString(std::string value);
+
+	private:
+		void getDateInfo(FILE *dataFile);
 	};
 }
 

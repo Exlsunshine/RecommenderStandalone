@@ -1,10 +1,20 @@
 #include "FileDataModel.h"
+#include "Utils.h"
 #include <iostream>
 #include <vector>
+#include <windef.h>
+#include <fileapi.h>
+#include <Windows.h>
+
 using namespace std;
 
 namespace RS
 {
+	const long FileDataModel::DEFAULT_MIN_RELOAD_INTERVAL_MS = 60 * 1000L;
+	const char FileDataModel::COMMENT_CHAR = '#';
+	const char FileDataModel::DELIMIETERS[] = { ',', '\t' };
+
+
 	//#######################			private member functions			#######################
 	std::vector<std::FILE> FileDataModel::findUpdateFilesAfter(long minimumLastModified){ vector<FILE> v; return v; }
 	long FileDataModel::readLastUpdateFileModified() { return 0; }
@@ -33,10 +43,31 @@ namespace RS
 	void FileDataModel::setMinPreference(float minPreferenceValue) { }
 
 	//#######################			public member functions			#######################
-	FileDataModel::FileDataModel(std::FILE _dataFile) { }
-	FileDataModel::FileDataModel(std::FILE dataFile, std::string delimiterRegex) { }
-	FileDataModel::FileDataModel(std::FILE dataFile, bool transpose, long minReloadIntervalMS) { }
-	FileDataModel::FileDataModel(std::FILE dataFile, bool transpose, long minReloadIntervalMS, std::string delimiterRegex) { }
+	FileDataModel::FileDataModel(std::FILE *_dataFile)
+	{
+		FileDataModel(_dataFile, false, DEFAULT_MIN_RELOAD_INTERVAL_MS);
+	}
+
+	FileDataModel::FileDataModel(std::FILE *dataFile, std::string delimiterRegex)
+	{
+		FileDataModel(dataFile, false, DEFAULT_MIN_RELOAD_INTERVAL_MS, delimiterRegex);
+	}
+
+	FileDataModel::FileDataModel(std::FILE *dataFile, bool transpose, long minReloadIntervalMS)
+	{
+		FileDataModel(dataFile, false, DEFAULT_MIN_RELOAD_INTERVAL_MS, NULL);
+	}
+	
+	FileDataModel::FileDataModel(std::FILE *dataFile, bool transpose, long minReloadIntervalMS, std::string delimiterRegex)
+	{
+		if (dataFile == NULL)
+		{
+			cout << "Open file error." << endl << "Press anykey to exit...";
+			cin.get();
+			exit(OPEN_FILE_ERROR);
+		}
+
+	}
 	std::FILE FileDataModel::getDataFile() { return FILE(); }
 	char FileDataModel::determineDelimiter(std::string line) { return '.'; }
 
@@ -50,4 +81,32 @@ namespace RS
 	long FileDataModel::readUserIDFromString(std::string value) { return 0; }
 	long FileDataModel::readItemIDFromString(std::string value) { return 0; }
 	long FileDataModel::readTimestampFromString(std::string value) { return 0; }
+
+
+
+
+
+
+	//#######################			private assist functions			#######################
+	void FileDataModel::getDateInfo(FILE *dataFile)
+	{
+		FILETIME creationTime, lastAccessTime, lastWriteTime;
+		
+		if (!GetFileTime(dataFile, &creationTime, &lastAccessTime, &lastWriteTime))
+		{
+			cout << "Get data file information failed." << endl << "Press anykey to exit...";
+			cin.get();
+			exit(READ_FILE_INFO_ERROR);
+		}
+
+		SYSTEMTIME sysTime;
+		if (!FileTimeToSystemTime(&lastWriteTime, &sysTime))
+		{
+			cout << "Get time information failed." << endl << "Press anykey to exit...";
+			cin.get();
+			exit(READ_TIME_INFO_ERROR);
+		}
+
+		sysTime.
+	}
 }

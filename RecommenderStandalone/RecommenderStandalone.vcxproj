@@ -82,6 +82,7 @@
     <ClInclude Include="FileDataModel.h" />
     <ClInclude Include="Preference.h" />
     <ClInclude Include="PreferenceArray.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DataModel.cpp" />

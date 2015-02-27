@@ -19,6 +19,9 @@
     <Filter Include="Source Files\DataModel">
       <UniqueIdentifier>{53fb3b7a-71eb-44dd-ad8d-fdb215626214}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{97eb1698-2111-4005-8546-ef628ed13c07}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Preference.h">
@@ -32,6 +35,9 @@
     </ClInclude>
     <ClInclude Include="FileDataModel.h">
       <Filter>Header Files\DataModel</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

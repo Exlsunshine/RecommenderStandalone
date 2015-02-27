@@ -1,11 +1,12 @@
 #include "FileDataModel.h"
 #include "Utils.h"
+
 #include <iostream>
 #include <vector>
-#include <windef.h>
-#include <fileapi.h>
-#include <Windows.h>
-
+#include <fstream>
+#include <atlstr.h>
+#include <string>
+#include <sstream>
 using namespace std;
 
 namespace RS
@@ -36,29 +37,48 @@ namespace RS
 	int FileDataModel::getNumUsersWithPreferenceFor(long itemID1, long itemID2) { return 0; }
 	void FileDataModel::setPreference(long userID, long itemID, float value) { }
 	void FileDataModel::removePreference(long userID, long itemID) { }
-	bool FileDataModel::hasPreferenceValues() { return false; }
+
+	bool FileDataModel::hasPreferenceValues()
+	{
+		ifstream is(fileName);
+		string line;
+		while (getline(is, line))
+		{
+			if (line.empty() || line[0] == COMMENT_CHAR)
+				continue;
+		}
+
+		vector<string> values;
+		std::stringstream ss(line);
+		string item;
+		while (getline(ss, item, delimiter))
+			values.push_back(item);
+
+		return values.size() >= 3 && !values[2].empty();
+	}
+
 	float FileDataModel::getMaxPreference() { return 0; }
 	float FileDataModel::getMinPreference() { return 0; }
 	void FileDataModel::setMaxPreference(float maxPreferenceValue) { }
 	void FileDataModel::setMinPreference(float minPreferenceValue) { }
 
 	//#######################			public member functions			#######################
-	FileDataModel::FileDataModel(std::FILE *_dataFile)
+	FileDataModel::FileDataModel(HANDLE dataFile)
 	{
-		FileDataModel(_dataFile, false, DEFAULT_MIN_RELOAD_INTERVAL_MS);
+		FileDataModel(dataFile, false, DEFAULT_MIN_RELOAD_INTERVAL_MS);
 	}
 
-	FileDataModel::FileDataModel(std::FILE *dataFile, std::string delimiterRegex)
+	FileDataModel::FileDataModel(HANDLE dataFile, std::string delimiterRegex)
 	{
 		FileDataModel(dataFile, false, DEFAULT_MIN_RELOAD_INTERVAL_MS, delimiterRegex);
 	}
 
-	FileDataModel::FileDataModel(std::FILE *dataFile, bool transpose, long minReloadIntervalMS)
+	FileDataModel::FileDataModel(HANDLE dataFile, bool transpose, long minReloadIntervalMS)
 	{
 		FileDataModel(dataFile, false, DEFAULT_MIN_RELOAD_INTERVAL_MS, NULL);
 	}
 	
-	FileDataModel::FileDataModel(std::FILE *dataFile, bool transpose, long minReloadIntervalMS, std::string delimiterRegex)
+	FileDataModel::FileDataModel(HANDLE dataFile, bool transpose, long minReloadIntervalMS, string delimiterRegex)
 	{
 		if (dataFile == NULL)
 		{
@@ -67,13 +87,22 @@ namespace RS
 			exit(OPEN_FILE_ERROR);
 		}
 
+		
+		lastModified = getLastWriteTime(dataFile);
+		lastUpdateFileModified = getLastWriteTime(dataFile);
+		delimiter = getDelimieter(fileName, delimiterRegex);
+		hasPrefValues = hasPreferenceValues();
 	}
 	std::FILE FileDataModel::getDataFile() { return FILE(); }
 	char FileDataModel::determineDelimiter(std::string line) { return '.'; }
 
 	//#######################			protected member functions			#######################
-	void FileDataModel::reload() { }
-	//DataModel FileDataModel::buildModel() { return DataModel(); }
+	void FileDataModel::reload()
+	{
+		buildModel();
+	}
+
+	DataModel FileDataModel::buildModel() { return DataModel(); }
 	void FileDataModel::processFile() { }//Insufficient params 
 	void FileDataModel::processLine() { }//Insufficient params 
 	void FileDataModel::processFileWithoutID() { }//Insufficient params 
@@ -88,25 +117,44 @@ namespace RS
 
 
 	//#######################			private assist functions			#######################
-	void FileDataModel::getDateInfo(FILE *dataFile)
+	unsigned long long FileDataModel::getLastWriteTime(HANDLE file)
 	{
 		FILETIME creationTime, lastAccessTime, lastWriteTime;
 		
-		if (!GetFileTime(dataFile, &creationTime, &lastAccessTime, &lastWriteTime))
+		if (!GetFileTime(file, &creationTime, &lastAccessTime, &lastWriteTime))
 		{
 			cout << "Get data file information failed." << endl << "Press anykey to exit...";
 			cin.get();
 			exit(READ_FILE_INFO_ERROR);
 		}
 
-		SYSTEMTIME sysTime;
-		if (!FileTimeToSystemTime(&lastWriteTime, &sysTime))
-		{
-			cout << "Get time information failed." << endl << "Press anykey to exit...";
-			cin.get();
-			exit(READ_TIME_INFO_ERROR);
-		}
+		ULARGE_INTEGER ularge;
+		ularge.LowPart = lastWriteTime.dwLowDateTime;
+		ularge.HighPart = lastWriteTime.dwHighDateTime;
+		
+		return ularge.QuadPart;
+	}
 
-		sysTime.
+	char FileDataModel::getDelimieter(string fileName, string delimiterRegex)
+	{
+		if (delimiterRegex.empty())
+		{
+			ifstream is(fileName);
+			string line;
+			while (getline(is, line))
+			{
+				if (line.empty() || line[0] == COMMENT_CHAR)
+					continue;
+			}
+
+			for (int i = 0; i < strlen(DELIMIETERS); i++)
+			{
+				if (line.find(DELIMIETERS[i]) >= 0)
+					return DELIMIETERS[i];
+			}
+			displayError("Delimieter not found.", DELIMIETER_NOT_FOUND_ERROR);
+		}
+		else
+			displayError("DelimiterRegex is not support yet.", FEATURE_NOT_SUPPORT_ERROR);
 	}
 }

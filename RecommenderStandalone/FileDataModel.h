@@ -1,6 +1,7 @@
 #ifndef FILE_DATAMODEL_H
 #define FILE_DATAMODEL_H
 
+#include <atlstr.h>
 #include <iostream>
 #include "DataModel.h"
 
@@ -13,8 +14,8 @@ namespace RS
 		static const char DELIMIETERS[];// = { ',', '\t' };
 
 		std::FILE dataFile;
-		long lastModified;
-		long lastUpdateFileModified;
+		unsigned long long lastModified;
+		unsigned long long lastUpdateFileModified;
 		char delimiter;
 		bool hasPrefValues;
 		DataModel delegate;
@@ -28,10 +29,10 @@ namespace RS
 	public:
 		static const long DEFAULT_MIN_RELOAD_INTERVAL_MS;// = 60 * 1000L;
 
-		FileDataModel(std::FILE *dataFile);
-		FileDataModel(std::FILE *dataFile, std::string delimiterRegex);
-		FileDataModel(std::FILE *dataFile, bool transpose, long minReloadIntervalMS);
-		FileDataModel(std::FILE *dataFile, bool transpose, long minReloadIntervalMS, std::string delimiterRegex);
+		FileDataModel(HANDLE dataFile);
+		FileDataModel(HANDLE dataFile, std::string delimiterRegex);
+		FileDataModel(HANDLE dataFile, bool transpose, long minReloadIntervalMS);
+		FileDataModel(HANDLE dataFile, bool transpose, long minReloadIntervalMS, std::string delimiterRegex);
 		std::FILE getDataFile();
 		static char determineDelimiter(std::string line);
 
@@ -67,8 +68,12 @@ namespace RS
 		long readItemIDFromString(std::string value);
 		long readTimestampFromString(std::string value);
 
+		
+	/******************************				My addation				******************************/
 	private:
-		void getDateInfo(FILE *dataFile);
+		std::string fileName;
+		unsigned long long getLastWriteTime(HANDLE dataFile);
+		char getDelimieter(std::string fileName, std::string delimiterRegex);
 	};
 }
 

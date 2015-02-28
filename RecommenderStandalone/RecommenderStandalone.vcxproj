@@ -81,6 +81,7 @@
     <ClInclude Include="DataModel.h" />
     <ClInclude Include="FileDataModel.h" />
     <ClInclude Include="GenericDataModel.h" />
+    <ClInclude Include="GenericPreference.h" />
     <ClInclude Include="GenericUserPreferenceArray.h" />
     <ClInclude Include="Preference.h" />
     <ClInclude Include="PreferenceArray.h" />
@@ -90,6 +91,7 @@
     <ClCompile Include="DataModel.cpp" />
     <ClCompile Include="DataModelUnitTest.cpp" />
     <ClCompile Include="FileDataModel.cpp" />
+    <ClCompile Include="GenericPreference.cpp" />
     <ClCompile Include="Preference.cpp" />
     <ClCompile Include="PreferenceArray.cpp" />
   </ItemGroup>

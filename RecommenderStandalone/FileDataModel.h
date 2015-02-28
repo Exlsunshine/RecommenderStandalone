@@ -28,11 +28,11 @@ namespace RS
 		static void removeTimestamp();//Insufficient params 
 	public:
 		static const long DEFAULT_MIN_RELOAD_INTERVAL_MS;// = 60 * 1000L;
-
-		FileDataModel(HANDLE dataFile);
-		FileDataModel(HANDLE dataFile, std::string delimiterRegex);
-		FileDataModel(HANDLE dataFile, bool transpose, long minReloadIntervalMS);
-		FileDataModel(HANDLE dataFile, bool transpose, long minReloadIntervalMS, std::string delimiterRegex);
+		
+		FileDataModel(std::string _fileName, HANDLE dataFile);
+		FileDataModel(std::string _fileName, HANDLE dataFile, std::string delimiterRegex);
+		FileDataModel(std::string _fileName, HANDLE dataFile, bool transpose, long minReloadIntervalMS);
+		FileDataModel(std::string _fileName, HANDLE dataFile, bool transpose, long minReloadIntervalMS, std::string delimiterRegex);
 		std::FILE getDataFile();
 		static char determineDelimiter(std::string line);
 
@@ -61,8 +61,8 @@ namespace RS
 	protected:
 		void reload();
 		DataModel* buildModel();
-		void processFile();//Insufficient params 
-		void processLine();//Insufficient params 
+		void processFile(boolean fromPriorData);//Insufficient params 
+		void processLine(std::string line, boolean fromPriorData);//Insufficient params 
 		void processFileWithoutID();//Insufficient params 
 		void processLineWithoutID();//Insufficient params 
 		long readUserIDFromString(std::string value);
@@ -72,9 +72,10 @@ namespace RS
 		
 	/******************************				My addation				******************************/
 	private:
-		std::string fileName = "C:\\Users\\USER007\\Desktop\\kits\\RecommenderStandalone\\Debug\\a.txt";
+		std::string fileName;
 		unsigned long long getLastWriteTime(HANDLE dataFile);
 		char getDelimieter(std::string fileName, std::string delimiterRegex);
+		bool isDataContainsPrefVals();
 	};
 }
 

@@ -40,21 +40,7 @@ namespace RS
 
 	bool FileDataModel::hasPreferenceValues()
 	{
-		ifstream is(fileName);
-		string line;
-		while (getline(is, line))
-		{
-			if (line.empty() || line[0] == COMMENT_CHAR)
-				continue;
-		}
-
-		vector<string> values;
-		std::stringstream ss(line);
-		string item;
-		while (getline(ss, item, delimiter))
-			values.push_back(item);
-
-		return values.size() >= 3 && !values[2].empty();
+		return false;
 	}
 
 	float FileDataModel::getMaxPreference() { return 0; }
@@ -64,22 +50,22 @@ namespace RS
 	string FileDataModel::toString(){ return ""; }
 
 	//#######################			public member functions			#######################
-	FileDataModel::FileDataModel(HANDLE dataFile)
+	FileDataModel::FileDataModel(std::string _fileName, HANDLE dataFile)
 	{
-		FileDataModel(dataFile, false, DEFAULT_MIN_RELOAD_INTERVAL_MS);
+		FileDataModel(_fileName,dataFile, false, DEFAULT_MIN_RELOAD_INTERVAL_MS);
 	}
 
-	FileDataModel::FileDataModel(HANDLE dataFile, std::string delimiterRegex)
+	FileDataModel::FileDataModel(std::string _fileName, HANDLE dataFile, std::string delimiterRegex)
 	{
-		FileDataModel(dataFile, false, DEFAULT_MIN_RELOAD_INTERVAL_MS, delimiterRegex);
+		FileDataModel(_fileName,dataFile, false, DEFAULT_MIN_RELOAD_INTERVAL_MS, delimiterRegex);
 	}
 
-	FileDataModel::FileDataModel(HANDLE dataFile, bool transpose, long minReloadIntervalMS)
+	FileDataModel::FileDataModel(std::string _fileName, HANDLE dataFile, bool transpose, long minReloadIntervalMS)
 	{
-		FileDataModel(dataFile, false, DEFAULT_MIN_RELOAD_INTERVAL_MS, "");
+		FileDataModel(_fileName,dataFile, false, DEFAULT_MIN_RELOAD_INTERVAL_MS, "");
 	}
 	
-	FileDataModel::FileDataModel(HANDLE dataFile, bool transpose, long minReloadIntervalMS, string delimiterRegex)
+	FileDataModel::FileDataModel(std::string _fileName, HANDLE dataFile, bool transpose, long minReloadIntervalMS, string delimiterRegex) :fileName(_fileName)
 	{
 		if (dataFile == NULL)
 		{
@@ -91,7 +77,7 @@ namespace RS
 		lastModified = getLastWriteTime(dataFile);
 		lastUpdateFileModified = getLastWriteTime(dataFile);
 		delimiter = getDelimieter(fileName, delimiterRegex);
-		hasPrefValues = hasPreferenceValues();
+		hasPrefValues = isDataContainsPrefVals();
 		this->transpose = transpose;
 		this->minReloadIntervalMS = minReloadIntervalMS;
 
@@ -108,16 +94,54 @@ namespace RS
 
 	DataModel* FileDataModel::buildModel()
 	{
+		if (hasPrefValues)
+		{
+			processFile(false);
+		}
+		else
+			displayError("Un-preferenceValues is not support yet.", FEATURE_NOT_SUPPORT_ERROR);
 
 		return new DataModel();
 	}
-	void FileDataModel::processFile() { }//Insufficient params 
-	void FileDataModel::processLine() { }//Insufficient params 
+	void FileDataModel::processFile(boolean fromPriorData) //Insufficient params 
+	{
+		ifstream is(fileName);
+		string line;
+
+		while (getline(is, line))
+		{
+			if (line.empty() || line[0] == COMMENT_CHAR)
+				continue;
+			else
+				processLine(line, fromPriorData);
+		}
+	}
+	void FileDataModel::processLine(string line, boolean fromPriorData) //Insufficient params 
+	{
+		
+
+		vector<string> values;
+		std::stringstream ss(line);
+		string element;
+		while (getline(ss, element, delimiter))
+			values.push_back(element);
+
+		long userID = readUserIDFromString(values[0]);
+		long itemID = readItemIDFromString(values[1]);
+		float preferenceValue = atof(values[2].c_str());
+
+		if (!fromPriorData)
+		{
+
+		}
+		else
+			displayError("fromPriorData is not supported yet.", FEATURE_NOT_SUPPORT_ERROR);
+	}
 	void FileDataModel::processFileWithoutID() { }//Insufficient params 
 	void FileDataModel::processLineWithoutID() { }//Insufficient params 
-	long FileDataModel::readUserIDFromString(std::string value) { return 0; }
-	long FileDataModel::readItemIDFromString(std::string value) { return 0; }
-	long FileDataModel::readTimestampFromString(std::string value) { return 0; }
+	long FileDataModel::readUserIDFromString(std::string value) { return atol(value.c_str()); }
+	long FileDataModel::readItemIDFromString(std::string value) { return atol(value.c_str()); }
+	long FileDataModel::readTimestampFromString(std::string value) { return atol(value.c_str()); }
 
 
 
@@ -166,5 +190,26 @@ namespace RS
 		}
 		else
 			displayError("DelimiterRegex is not support yet.", FEATURE_NOT_SUPPORT_ERROR);
+	}
+
+	bool FileDataModel::isDataContainsPrefVals()
+	{
+		ifstream is(fileName);
+		string line;
+		while (getline(is, line))
+		{
+			if (line.empty() || line[0] == COMMENT_CHAR)
+				continue;
+			else
+				break;
+		}
+
+		vector<string> values;
+		std::stringstream ss(line);
+		string item;
+		while (getline(ss, item, delimiter))
+			values.push_back(item);
+
+		return values.size() >= 3 && !values[2].empty();
 	}
 }

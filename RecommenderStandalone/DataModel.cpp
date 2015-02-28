@@ -23,4 +23,5 @@ namespace RS
 	float DataModel::getMinPreference() { return 0; }
 	void DataModel::setMaxPreference(float maxPreferenceValue) { }
 	void DataModel::setMinPreference(float minPreferenceValue) { }
+	std::string DataModel::toString(){ return ""; }
 }

@@ -80,6 +80,8 @@
   <ItemGroup>
     <ClInclude Include="DataModel.h" />
     <ClInclude Include="FileDataModel.h" />
+    <ClInclude Include="GenericDataModel.h" />
+    <ClInclude Include="GenericUserPreferenceArray.h" />
     <ClInclude Include="Preference.h" />
     <ClInclude Include="PreferenceArray.h" />
     <ClInclude Include="Utils.h" />

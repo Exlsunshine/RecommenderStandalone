@@ -94,7 +94,7 @@ namespace RS
 		/**
 		* @return independent copy of this object
 		*/
-		virtual PreferenceArray clone();
+		virtual PreferenceArray& clone();
 
 		/**
 		* Sorts underlying array by user ID, ascending.

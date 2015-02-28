@@ -1,5 +1,7 @@
 #include "Preference.h"
 
+#include "GenericUserPreferenceArray.h"
+
 namespace RS
 {
 	long Preference::getUserID() { return 0; }

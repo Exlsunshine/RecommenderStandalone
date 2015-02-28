@@ -18,7 +18,7 @@ namespace RS
 		unsigned long long lastUpdateFileModified;
 		char delimiter;
 		bool hasPrefValues;
-		DataModel delegate;
+		DataModel *delegate;
 		bool transpose;
 		long minReloadIntervalMS;
 
@@ -36,7 +36,7 @@ namespace RS
 		std::FILE getDataFile();
 		static char determineDelimiter(std::string line);
 
-		//Below functions are overrided from DataModel
+		/******************		Below functions are overrided from DataModel		******************/
 		std::vector<long> getUserIDs();
 		PreferenceArray getPreferencesFromUser(long userID);
 		std::vector<long> getItemIDsFromUser(long userID);
@@ -55,11 +55,12 @@ namespace RS
 		float getMinPreference();
 		void setMaxPreference(float maxPreferenceValue);
 		void setMinPreference(float minPreferenceValue);
-		//Above functions are overrided from DataModel
+		std::string toString();
+		/******************		Above functions are overrided from DataModel		******************/
 
 	protected:
 		void reload();
-		DataModel buildModel();
+		DataModel* buildModel();
 		void processFile();//Insufficient params 
 		void processLine();//Insufficient params 
 		void processFileWithoutID();//Insufficient params 
@@ -71,7 +72,7 @@ namespace RS
 		
 	/******************************				My addation				******************************/
 	private:
-		std::string fileName;
+		std::string fileName = "C:\\Users\\USER007\\Desktop\\kits\\RecommenderStandalone\\Debug\\a.txt";
 		unsigned long long getLastWriteTime(HANDLE dataFile);
 		char getDelimieter(std::string fileName, std::string delimiterRegex);
 	};

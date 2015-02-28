@@ -148,6 +148,8 @@ namespace RS
 		virtual void setMaxPreference(float maxPreferenceValue);
 
 		virtual void setMinPreference(float minPreferenceValue);
+
+		virtual std::string toString();
 	};
 }
 

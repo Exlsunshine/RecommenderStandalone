@@ -13,7 +13,7 @@ namespace RS
 	std::vector<long> PreferenceArray::getIDs() { vector<long> v; return v; }
 	float PreferenceArray::getValue(int i) { return 0; }
 	void PreferenceArray::setValue(int i, float value) {}
-	PreferenceArray PreferenceArray::clone() { return PreferenceArray(); }
+	PreferenceArray& PreferenceArray::clone() { return *(new PreferenceArray()); }
 	void PreferenceArray::sortByUser() {}
 	void PreferenceArray::sortByItem() {}
 	void PreferenceArray::sortByValue() {}

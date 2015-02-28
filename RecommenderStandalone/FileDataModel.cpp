@@ -61,6 +61,7 @@ namespace RS
 	float FileDataModel::getMinPreference() { return 0; }
 	void FileDataModel::setMaxPreference(float maxPreferenceValue) { }
 	void FileDataModel::setMinPreference(float minPreferenceValue) { }
+	string FileDataModel::toString(){ return ""; }
 
 	//#######################			public member functions			#######################
 	FileDataModel::FileDataModel(HANDLE dataFile)
@@ -75,7 +76,7 @@ namespace RS
 
 	FileDataModel::FileDataModel(HANDLE dataFile, bool transpose, long minReloadIntervalMS)
 	{
-		FileDataModel(dataFile, false, DEFAULT_MIN_RELOAD_INTERVAL_MS, NULL);
+		FileDataModel(dataFile, false, DEFAULT_MIN_RELOAD_INTERVAL_MS, "");
 	}
 	
 	FileDataModel::FileDataModel(HANDLE dataFile, bool transpose, long minReloadIntervalMS, string delimiterRegex)
@@ -86,12 +87,15 @@ namespace RS
 			cin.get();
 			exit(OPEN_FILE_ERROR);
 		}
-
 		
 		lastModified = getLastWriteTime(dataFile);
 		lastUpdateFileModified = getLastWriteTime(dataFile);
 		delimiter = getDelimieter(fileName, delimiterRegex);
 		hasPrefValues = hasPreferenceValues();
+		this->transpose = transpose;
+		this->minReloadIntervalMS = minReloadIntervalMS;
+
+		reload();
 	}
 	std::FILE FileDataModel::getDataFile() { return FILE(); }
 	char FileDataModel::determineDelimiter(std::string line) { return '.'; }
@@ -99,10 +103,14 @@ namespace RS
 	//#######################			protected member functions			#######################
 	void FileDataModel::reload()
 	{
-		buildModel();
+		delegate = buildModel();
 	}
 
-	DataModel FileDataModel::buildModel() { return DataModel(); }
+	DataModel* FileDataModel::buildModel()
+	{
+
+		return new DataModel();
+	}
 	void FileDataModel::processFile() { }//Insufficient params 
 	void FileDataModel::processLine() { }//Insufficient params 
 	void FileDataModel::processFileWithoutID() { }//Insufficient params 
@@ -145,11 +153,13 @@ namespace RS
 			{
 				if (line.empty() || line[0] == COMMENT_CHAR)
 					continue;
+				else
+					break;
 			}
 
 			for (int i = 0; i < strlen(DELIMIETERS); i++)
 			{
-				if (line.find(DELIMIETERS[i]) >= 0)
+				if (line.find(DELIMIETERS[i]) != string::npos)
 					return DELIMIETERS[i];
 			}
 			displayError("Delimieter not found.", DELIMIETER_NOT_FOUND_ERROR);
